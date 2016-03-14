@@ -1,2 +1,5 @@
 # VIM stuff
 *.swp
+
+# other stuff
+*.zip
