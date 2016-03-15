@@ -50,7 +50,7 @@ public class RequestPDU {
                     op1 = Integer.parseInt(elements[2].trim());
                     op2 = Integer.parseInt(elements[3].trim());
                 }
-             } catch {
+             } catch(NumberFormatException nfe) {
                 System.err.println(nfe);
                 throw new IllegalFormatException();
              }

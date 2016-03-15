@@ -15,7 +15,7 @@ public class CalculatorProtocolServer extends Thread{
         try{
             datagram = new DatagramSocket(portNumber);
         }catch(IOException se){
-            System.err.println("Nao foi possivel inicializar protocolo: "+se);
+            System.err.println("Not possible to initialize protocol: "+se);
             System.exit(0);
         }
     }
@@ -39,7 +39,14 @@ public class CalculatorProtocolServer extends Thread{
                 datagram.receive(reqPacket);
 
                 // extracts pdu
-                
+                try {
+                    RequestPDU reqPdu = new RequestPDU(reqPacket.getData());
+                } catch(IllegalFormatException ife) {
+                    System.err.println(ife);
+                    System.exit(0);
+                }
+                op1 = reqPdu.getOp1();
+                op2 = reqPdu.getOp2();
 
                 // extracts info
                 
@@ -47,16 +54,25 @@ public class CalculatorProtocolServer extends Thread{
                 // check request
                 switch(reqPdu.getOpcode()){
                     case 0: // calculate add
-                        
+                        result = op1 + op2;
+                        respCode = 1;
                         break;
                     case 1: // calculate sub
-                        
+                        result = op1 - op2;
+                        respCode = 1;
                         break;
                     case 2: // calculate times
-                        
+                        result = op1 * op2;
+                        respCode = 1;
                         break;
                     case 3: // calculate div
-                        
+                        if ( op2 != 0) {
+                            result = op1/op2;
+                            respCode = 1;
+                        } else {
+                            result = 0;
+                            respCode = 0;
+                        }
                         break;
                 }
 
