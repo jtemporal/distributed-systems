@@ -6,3 +6,6 @@
 
 # tmuxp stuff
 .tmuxp.yaml
+
+# java classes
+*.class
