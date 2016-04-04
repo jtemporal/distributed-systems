@@ -3,3 +3,6 @@
 
 # other stuff
 *.zip
+
+# tmuxp stuff
+.tmuxp.yaml
