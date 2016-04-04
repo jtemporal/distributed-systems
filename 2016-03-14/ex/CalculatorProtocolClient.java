@@ -10,7 +10,7 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
     // declaring constant
     private final short TIMEOUT = 100;
 
-      // declaring variables
+    // declaring variables
     private ServiceUserInterface serviceUser;	// Service user reference
     private int currentState;                 	// Protocol entity current state
 
@@ -43,11 +43,25 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
         DatagramPacket reqPacket;
 
         // create pdu
-        
+        try {
+            pdu = new RequestPDU(0, op1, op2); // 0 for add as especified
+        } catch (IllegalFormatException ife){
+            System.err.println(ife);
+            System.exit(0);
+        }
+
         // create packet
+        reqPacket = new DatagramPacket(pdu.getPDUData(),
+                pdu.getPDUData().length, remoteAddress, remotePortNumber);
 
         // send packet
-        
+        try {
+            datagram.send(reqPacket);
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+            System.exit(0);
+        }
+
         // update current state
         currentState = 1;
     }
@@ -56,11 +70,25 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
         DatagramPacket reqPacket;
 
         // create pdu
-        
+        try {
+            pdu = new RequestPDU(1, op1, op2); // 0 for add as especificated
+        } catch(IllegalFormatException ife){
+            System.err.println(ife);
+            System.exit(0);
+        }
+
         // create packet
+        reqPacket = new DatagramPacket(pdu.getPDUData(),
+                pdu.getPDUData().length, remoteAddress, remotePortNumber);
 
         // send packet
-        
+        try {
+            datagram.send(reqPacket);
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+            System.exit(0);
+        }
+
         // update current state
         currentState = 1;       
     }
@@ -69,11 +97,25 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
         DatagramPacket reqPacket;
 
         // create pdu
-        
+        try {
+            pdu = new RequestPDU(2, op1, op2); // 0 for add as especificated
+        } catch(IllegalFormatException ife){
+            System.err.println(ife);
+            System.exit(0);
+        }
+
         // create packet
+        reqPacket = new DatagramPacket(pdu.getPDUData(),
+                pdu.getPDUData().length, remoteAddress, remotePortNumber);
 
         // send packet
-        
+        try {
+            datagram.send(reqPacket);
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+            System.exit(0);
+        }
+
         // update current state
         currentState = 1;
     }
@@ -82,11 +124,25 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
         DatagramPacket reqPacket;
 
         // create pdu
-        
+        try {
+            pdu = new RequestPDU(3, op1, op2); // 0 for add as especificated
+        } catch(IllegalFormatException ife){
+            System.err.println(ife);
+            System.exit(0);
+        }
+
         // create packet
+        reqPacket = new DatagramPacket(pdu.getPDUData(),
+                pdu.getPDUData().length, remoteAddress, remotePortNumber);
 
         // send packet
-        
+        try {
+            datagram.send(reqPacket);
+        } catch (IOException ioe) {
+            System.err.println(ioe);
+            System.exit(0);
+        }
+
         // update current state
         currentState = 1;
     }
@@ -103,6 +159,11 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
             switch (currentState){
                 case 0:
 					// sleep
+                    try {
+                        sleep(100);
+                    } catch(InterruptedException ie) {
+                        System.err.println(ie);
+                    }
                     break;
                 case 1:
                     buf = new byte[128];
@@ -115,9 +176,20 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
                         datagram.receive(responsePacket);
 
                         // extracts pdu
-                        
+                        try {
+                            respPdu = new ResponsePDU(responsePacket.getData());
+                        } catch (IllegalFormatException ife) {
+                            System.err.println(ife);
+                            System.exit(0);
+                        }
+
                         // check response
-                        
+                        if (respPdu.getRespcode() == 1) { // success
+                           serviceUser.result(respPdu.getResult());
+                        } else { // fail
+                            serviceUser.error();
+                        }
+ 
                         // update state
                         currentState = 0;
                     } catch (SocketException se){
@@ -125,9 +197,16 @@ public class CalculatorProtocolClient extends Thread implements ServiceInterface
                     } catch(SocketTimeoutException ste){
                         // timeout - retransmit
                         // create packet
+                        reqPacket = new DatagramPacket(pdu.getPDUData(),
+                            pdu.getPDUData().length, remoteAddress, remotePortNumber);
 
                         // send packet
-                        
+                        try {
+                            datagram.send(reqPacket);
+                        } catch (IOException ioe) {
+                            System.err.println(ioe);
+                            System.exit(0);
+                        }
                     } catch (IOException ioe){
                         System.err.println("Could not receive data: "+ioe);
                     }

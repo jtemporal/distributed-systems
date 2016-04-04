@@ -77,13 +77,24 @@ public class CalculatorProtocolServer extends Thread{
                 }
 
                 // create response PDU
-               
+                try { 
+                    RequestPDU reqPdu = new ResponsePDU(respCode, result);
+                } catch(IllegalFormatException ife) {
+                    System.err.println(ife);
+                    System.exit(0);
+                }
 
                 // create response packet
-               
+                responsePacket = new DatagramPacket(respPdu.getPDUData(), 
+                        respPdu.getPDUData().length, reqPacket, getAdress(),
+                        respPdu.getPort());
 
                 // send response packet
-                
+                try {
+                    datagram.send(responsePacket);
+                } catch(IOException ioe) {
+                    System.err.println("Coud not send result");
+                }
             } catch (IOException ioe){
                 System.err.println("Could not receive data: "+ioe);
             }
